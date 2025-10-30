@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Image Door</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+      perspective: 1000px;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+    }
+
+    .door-container {
+      position: relative;
+      width: 400px;
+      height: 300px;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+
+    .door-frame {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .doors {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      transform-style: preserve-3d;
+      z-index: 3;
+    }
+
+    .door {
+      width: 50%;
+      height: 100%;
+      background-size: 200% 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: transform 1s ease-in-out;
+      transform-style: preserve-3d;
+    }
+
+    .door-left {
+      background-position: left center;
+      transform-origin: left center;
+    }
+
+    .door-right {
+      background-position: right center;
+      transform-origin: right center;
+    }
+
+    .opened .door-left {
+      transform: rotateY(-120deg);
+    }
+
+    .opened .door-right {
+      transform: rotateY(120deg);
+    }
+
+    .inside-page {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transform: translateZ(-2px);
+      transition: opacity 1s ease-in-out 0.4s;
+      z-index: 1;
+    }
+
+    .opened .inside-page {
+      opacity: 1;
+    }
+
+    .inside-page img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="door-container" id="doorContainer">
+    <div class="door-frame">
+      <div class="doors">
+        <div class="door door-left" id="doorLeft"></div>
+        <div class="door door-right" id="doorRight"></div>
+      </div>
+
+      <div class="inside-page">
+        <img src="inside.png" alt="Inside Image" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById("doorContainer");
+    const leftDoor = document.getElementById("doorLeft");
+    const rightDoor = document.getElementById("doorRight");
+
+    // Replace this with your outside image
+    const imageSrc = "chirkutt.png"; 
+
+    leftDoor.style.backgroundImage = `url(${imageSrc})`;
+    rightDoor.style.backgroundImage = `url(${imageSrc})`;
+
+    container.addEventListener("click", () => {
+      container.classList.toggle("opened");
+    });
+  </script>
+</body>
+</html>

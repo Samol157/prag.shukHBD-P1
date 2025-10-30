@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animated Birthday Card</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 20px;
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 50%, #4dd0e1 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card-container {
+      width: 100%;
+      max-width: 800px;
+      height: 600px;
+      position: relative;
+      perspective: 1200px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+      cursor: pointer;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .card-front {
+      background: white;
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      transform: rotateY(180deg);
+    }
+
+    .background-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .content-layer {
+      position: relative;
+      z-index: 10;
+      padding: 40px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .title {
+      font-size: 3.5rem;
+      font-weight: bold;
+      text-align: center;
+      background: linear-gradient(45deg, #0277bd, #00acc1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      animation: titleGlow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes titleGlow {
+      0% {
+        filter: brightness(1);
+      }
+      100% {
+        filter: brightness(1.2);
+      }
+    }
+
+    .interactive-elements {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0;
+    }
+
+    .cake-svg {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .cake-svg:hover {
+      transform: scale(1.05);
+    }
+
+    .cake-svg.clicked {
+      animation: cakeBounce 0.8s ease-out;
+    }
+
+    @keyframes cakeBounce {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.15);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .candle-flame {
+      animation: flicker 1.5s ease-in-out infinite alternate;
+      transform-origin: center bottom;
+    }
+
+    @keyframes flicker {
+      0% {
+        opacity: 0.8;
+        transform: scale(1) rotate(-2deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1.2) rotate(2deg);
+      }
+    }
+
+    .message-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(2, 119, 189, 0.2);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .message-text {
+      font-size: 1.1rem;
+      color: #2c3e50;
+      line-height: 1.8;
+      text-align: justify;
+    }
+
+    .flip-instruction {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(45deg, #0277bd, #00acc1);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: bold;
+      animation: pulse 2s infinite;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 0.8;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+
+    /* --- BACK SIDE --- */
+    .back-content {
+      position: relative;
+      z-index: 5;
+      padding: 60px 40px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .back-title {
+      font-size: 3rem;
+      color: #0277bd;
+      font-weight: bold;
+      margin-bottom: 50px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      animation: backTitleFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes backTitleFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .picture-frame {
+  width: 350px;                 /* set width */
+  height: 350px;                /* make it square */
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px dashed #00acc1;
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  color: #0277bd;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  animation: frameGlow 4s ease-in-out infinite;
+  display: flex;                /* centers text inside */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;             /* hides overflow if you later add an image */
+}
+
+
+    @keyframes frameGlow {
+      0%, 100% {
+        border-color: #00acc1;
+      }
+      50% {
+        border-color: #0277bd;
+      }
+    }
+
+    .flip-back-btn {
+      margin-top: 40px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(45deg, #0277bd, #00acc1);
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .flip-back-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .card-container {
+        height: 700px;
+      }
+      .title {
+        font-size: 2.5rem;
+      }
+      .back-title {
+        font-size: 2.2rem;
+      }
+      .picture-frame {
+        width: 300px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card-container">
+    <div class="card" id="birthdayCard">
+
+      <!-- FRONT SIDE -->
+      <div class="card-face card-front">
+        <svg class="background-svg" viewBox="0 0 800 600">
+          <defs>
+            <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#e3f2fd;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#b3e5fc;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#4dd0e1;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#bgGradient)" />
+        </svg>
+
+        <div class="content-layer">
+          <div>
+            <h1 class="title">Happy Birthday, BABY</h1>
+
+            <div class="interactive-elements">
+              <!-- birthday cake SVG -->
+              <svg class="cake-svg" id="birthdayCake" width="200" height="150" viewBox="0 0 200 150">
+                <defs>
+                  <linearGradient id="cakeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ff9a9e" />
+                    <stop offset="100%" style="stop-color:#fecfef" />
+                  </linearGradient>
+                </defs>
+                <ellipse cx="100" cy="135" rx="85" ry="12" fill="rgba(0,0,0,0.1)" />
+                <rect x="20" y="85" width="160" height="35" fill="url(#cakeGradient)" />
+                <ellipse cx="100" cy="120" rx="80" ry="15" fill="#d4a574" />
+                <ellipse cx="100" cy="85" rx="80" ry="15" fill="#ff9a9e" />
+                <ellipse cx="100" cy="50" rx="60" ry="12" fill="#fff" />
+                <rect x="70" y="30" width="4" height="20" fill="#ffd700" rx="2" />
+                <rect x="90" y="30" width="4" height="20" fill="#ffd700" rx="2" />
+                <rect x="110" y="30" width="4" height="20" fill="#ffd700" rx="2" />
+                <rect x="130" y="30" width="4" height="20" fill="#ffd700" rx="2" />
+                <ellipse class="candle-flame" cx="72" cy="25" rx="2.5" ry="5" fill="#ff4500" />
+                <ellipse class="candle-flame" cx="92" cy="25" rx="2.5" ry="5" fill="#ff4500" />
+                <ellipse class="candle-flame" cx="112" cy="25" rx="2.5" ry="5" fill="#ff4500" />
+                <ellipse class="candle-flame" cx="132" cy="25" rx="2.5" ry="5" fill="#ff4500" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="message-container">
+            <p class="message-text">
+              My dearest love, today marks another beautiful year of your incredible existence, and I couldn't be more grateful to celebrate this special day with you. From the moment you entered my life, everything changed for the better. Your smile became my sunrise, your laughter became my favorite melody, and your love became the foundation of my happiness. <br><br> Every day with you feels like a gift wrapped in joy and tied with endless possibilities. You have this amazing ability to make the ordinary moments feel extraordinary, to turn simple conversations into treasured memories, and to fill even the quietest spaces with warmth and love. Your kindness touches everyone around you, but I'm the lucky one who gets to witness your beautiful heart every single day. <br><br> I love how you challenge me to be better, how you support my dreams even when they seem impossible, and how you believe in us even when the world feels uncertain. Your strength inspires me, your gentleness comforts me, and your love completes me in ways I never knew were possible. You're not just my boyfriend; you're my best friend, my confidant, my partner in all of life's adventures. <br><br> As you blow out your candles today, know that each flame represents a wish I have for you - for endless happiness, boundless success, perfect health, and all the love your heart can hold. I promise to continue loving you with everything I have, to stand by your side through every season of life, and to celebrate not just your birthday, but every single day we get to share together. <br><br> Happy Birthday, my amazing boyfriend. Here's to another year of your wonderful life, another year of our beautiful love story, and countless more memories yet to be made. You deserve all the happiness in the world, and I'm honored to be part of your journey. I love you more than words could ever express! 💕🎂✨  My dearest love, today marks another beautiful year of your incredible existence, and I couldn't be more grateful to celebrate this special day with you. From the moment you entered my life, everything changed for the better. Your smile became my sunrise, your laughter became my favorite melody, and your love became the foundation of my happiness. <br><br> Every day with you feels like a gift wrapped in joy and tied with endless possibilities. You have this amazing ability to make the ordinary moments feel extraordinary, to turn simple conversations into treasured memories, and to fill even the quietest spaces with warmth and love. Your kindness touches everyone around you, but I'm the lucky one who gets to witness your beautiful heart every single day. <br><br> I love how you challenge me to be better, how you support my dreams even when they seem impossible, and how you believe in us even when the world feels uncertain. Your strength inspires me, your gentleness comforts me, and your love completes me in ways I never knew were possible. You're not just my boyfriend; you're my best friend, my confidant, my partner in all of life's adventures. <br><br> As you blow out your candles today, know that each flame represents a wish I have for you - for endless happiness, boundless success, perfect health, and all the love your heart can hold. I promise to continue loving you with everything I have, to stand by your side through every season of life, and to celebrate not just your birthday, but every single day we get to share together. <br><br> Happy Birthday, my amazing boyfriend. Here's to another year of your wonderful life, another year of our beautiful love story, and countless more memories yet to be made. You deserve all the happiness in the world, and I'm honored to be part of your journey. I love you more than words could ever express! 💕🎂✨
+              </p>
+           <button class="flip-back-btn"
+  onclick="document.getElementById('birthdayCard').classList.remove('flipped');">
+  Click to flip back
+</button>
+
+           
+            </p>
+          </div>
+        </div>
+
+        <div class="flip-instruction">Click to FLIP CARD</div>
+      </div>
+
+      <!-- BACK SIDE -->
+      <div class="card-face card-back">
+        <svg class="background-svg" viewBox="0 0 800 600">
+          <defs>
+            <linearGradient id="backGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#backGradient)" />
+        </svg>
+
+        <div class="back-content">
+          <h2 class="back-title">I Have Something For You!</h2>
+
+          <div class="picture-frame">
+            <strong>Perfect spot for your meme or special picture!</strong>
+            <p>
+              This space is ready for that hilarious meme, cute photo, or special surprise
+              you want to share. Just add your image here to complete the perfect moment!
+            </p>
+          </div>
+
+          <button class="flip-back-btn"
+            onclick="document.getElementById('birthdayCard').classList.remove('flipped');">
+            Click to flip back
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const card = document.getElementById('birthdayCard');
+    card.addEventListener('click', function (e) {
+      if (!e.target.closest('#birthdayCake')) {
+        card.classList.toggle('flipped');
+      }
+    });
+
+    const cake = document.getElementById('birthdayCake');
+    cake.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cake.classList.add('clicked');
+      setTimeout(() => cake.classList.remove('clicked'), 800);
+    });
+  </script>
+</body>
+</html>
+
+
+
+
